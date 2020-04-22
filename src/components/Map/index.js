@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { View } from 'react-native';
 import MapView from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
+import { getPixelSize } from '../../utils';
 
 import Search from '../Search';
 import Directions from '../Directions';
@@ -70,10 +71,10 @@ export default class Map extends Component {
               onReady={(result) => {
                 this.mapView.fitToCoordinates(result.coordinates, {
                   edgePadding: {
-                    right: 50,
-                    left: 50,
-                    top: 50,
-                    bottom: 50,
+                    right: getPixelSize(50),
+                    left: getPixelSize(50),
+                    top: getPixelSize(50),
+                    bottom: getPixelSize(50),
                   },
                 });
               }}
