@@ -1,18 +1,24 @@
 /* eslint-disable react/state-in-constructor */
-import React, { useEffect, useState } from 'react';
+import React, { Component } from 'react';
 import { View } from 'react-native';
 import MapView from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
 import Search from '../Search';
+import Directions from '../Directions';
 
-export default function Map() {
-  const [region, setRegion] = useState(null);
+export default class Map extends Component {
+  state = {
+    region: null,
+    destination: null,
+    duration: null,
+    location: null,
+  };
 
-  useEffect(() => {
+  async componentDidMount() {
     Geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
-        setRegion({
+        setState({
           region: {
             latitude,
             longitude,
@@ -29,17 +35,53 @@ export default function Map() {
         maximumAge: 1000,
       }
     );
-  }, []);
+  }
 
-  return (
-    <View style={{ flex: 1 }}>
-      <MapView
-        style={{ flex: 1 }}
-        region={region}
-        showsUserLocation
-        loadingEnabled
-      />
-      <Search />
-    </View>
-  );
+  handleLocationSelected = (data, { geometry }) => {
+    const {
+      location: { lat: latitude, lng: longitude },
+    } = geometry;
+
+    this.setState({
+      destination: {
+        latitude,
+        longitude,
+        title: data.structured_formatting.main_text,
+      },
+    });
+  };
+
+  render() {
+    const { region, destination } = this.state;
+
+    return (
+      <View style={{ flex: 1 }}>
+        <MapView
+          style={{ flex: 1 }}
+          region={region}
+          showsUserLocation
+          loadingEnabled
+          ref={(el) => (this.mapView = el)}
+        >
+          {destination && (
+            <Directions
+              origin={region}
+              destination={destination}
+              onReady={(result) => {
+                this.mapView.fitToCoordinates(result.coordinates, {
+                  edgePadding: {
+                    right: 50,
+                    left: 50,
+                    top: 50,
+                    bottom: 50,
+                  },
+                });
+              }}
+            />
+          )}
+        </MapView>
+        <Search onLocationSelected={this.handleLocationSelected} />
+      </View>
+    );
+  }
 }
