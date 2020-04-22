@@ -1,9 +1,10 @@
 /* eslint-disable react/state-in-constructor */
 import React, { useEffect, useState } from 'react';
-import MapView from 'react-native-maps';
 import { View } from 'react-native';
-
+import MapView from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
+
+import Search from '../Search';
 
 export default function Map() {
   const [region, setRegion] = useState(null);
@@ -38,6 +39,7 @@ export default function Map() {
         showsUserLocation
         loadingEnabled
       />
+      <Search />
     </View>
   );
 }
